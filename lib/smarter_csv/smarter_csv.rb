@@ -33,7 +33,7 @@ module SmarterCSV
         line_count += 1
         header = header.gsub(options[:strip_chars_from_headers], '') if options[:strip_chars_from_headers]
         if (header =~ %r{#{options[:quote_char]}}) and (! options[:force_simple_split])
-          file_headerA = CSV.parse( header, csv_options ).flatten.collect!{|x| x.nil? ? '' : x} # to deal with nil values from CSV.parse
+          file_headerA = CSV.parse( header, **csv_options ).flatten.collect!{|x| x.nil? ? '' : x} # to deal with nil values from CSV.parse
         else
           file_headerA =  header.split(options[:col_sep])
         end
@@ -90,12 +90,12 @@ module SmarterCSV
 
         # cater for the quoted csv data containing the row separator carriage return character
         # in which case the row data will be split across multiple lines (see the sample content in spec/fixtures/carriage_returns_rn.csv)
-        # by detecting the existence of an uneven number of quote characters 
+        # by detecting the existence of an uneven number of quote characters
         while line.count(options[:quote_char])%2 == 1
           print "line contains uneven number of quote chars so including content of next line" if options[:verbose]
           line += f.readline
         end
-        
+
         line.chomp!    # will use $/ which is set to options[:col_sep]
 
         if (line =~ %r{#{options[:quote_char]}}) and (! options[:force_simple_split])
